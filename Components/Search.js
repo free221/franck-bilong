@@ -6,28 +6,35 @@ import { getFilmsFromApiWithSearchedText } from '../API/TMDBApi'
 
 class Search extends React.Component {
 
-  constructor(props) {
-    super(props)
-    this._films = []
+ constructor(props) {
+   super(props)
+   this.state = {
+      films: [],
+      searchText: ""
+   }
   }
 
-    _loadFilms() {
-        getFilmsFromApiWithSearchedText("star").then(data => {
-          this._films = data.results
-          this.forceUpdate()
-        });
+  _loadFilms() {
+    if (this.state.searchedText.length > 0) {
+      getFilmsFromApiWithSearchedText(this.state.searchedText).then(data => this.setState({ films: data.results }))
     }
+  }
+  _searchTextInputChanged(text) {
+    this.setState({ searchedText: text })
+  }
+
 
     render() {
+      console.log("Render");
       return (
         <View style={styles.main_container}>
-           <TextInput style={styles.textinput} placeholder='Titre du film'/>
-           <Button title='Rechercher' onPress={() => this._loadFilms()}/>
+           <TextInput onChangeText={(text) => this._searchTextInputChanged(text)} style={styles.textinput} placeholder="Titre du film"/>
+           <Button style={{ height: 50 }} title="Rechercher" onPress={() => this._loadFilms()}/>
            <FlatList
-             data={this._films}
+             data={this.state.films}
              keyExtractor={(item) => item.id.toString()}
              renderItem={({item}) => <FilmItem film={item}/>}
-        />
+           />
         </View>
       )
     }
